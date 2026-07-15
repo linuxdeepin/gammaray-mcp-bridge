@@ -1,0 +1,25 @@
+# Build artifacts
+build/
+bridge/build/
+install-prefix/
+_CPack_Packages/
+*.deb
+
+# Compiled test binaries (not committed)
+tests/testapp/widget_test_app
+
+# Python
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
