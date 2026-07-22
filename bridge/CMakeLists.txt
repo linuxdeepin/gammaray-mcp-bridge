@@ -12,28 +12,29 @@ set(CMAKE_CXX_STANDARD 20)              # qtmcp requires C++20
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-# --- qtmcp via FetchContent FIRST ---
-# qtmcp's find_package(Qt6) (inside the subdirectory) creates 3rd-party targets
-# like Threads::Threads and promotes them to global THERE. If a prior top-level
-# find_package(Qt6)/find_package(GammaRay) already created Threads::Threads at top
-# scope, the subdirectory promotion fails ("not built in this directory"). So
-# FetchContent runs before any Qt6/GammaRay find at this level.
-include(FetchContent)
-FetchContent_Declare(
-  qtmcp
-  GIT_REPOSITORY https://github.com/signal-slot/qtmcp.git
-  GIT_TAG 2706345c44e282aba15cf020608af2283e9fb5f9
-  GIT_SHALLOW TRUE
-  GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
-)
-# Qt-prefixed vars (NOT BUILD_EXAMPLES) — verified to suppress example/test build.
-set(QT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(QT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-# qtmcp is built as shared libs + plugins (Qt plugin system requires this).
-# For a distribution deb, the package includes the qtmcp shared libs and
-# stdio plugin alongside the bridge binary. CPACK_DEBIAN_PACKAGE_SHLIBDEPS
-# auto-detects the required system dependencies (gammaray, qt6, etc.).
-FetchContent_MakeAvailable(qtmcp)
+# --- qtmcp: try system package first, fall back to FetchContent ---
+# qtmcp registers itself as a Qt6 module; find_package(Qt6 COMPONENTS McpServer)
+# looks for Qt6McpServerConfig.cmake installed by the system qtmcp-dev package.
+# When falling back to FetchContent, it must run before any other Qt6/GammaRay
+# find_package calls because qtmcp's subdirectory promotes 3rd-party targets
+# (Threads::Threads) to global scope, and prior top-level find_package calls
+# that already created those targets would cause a "not built in this directory"
+# error.
+find_package(Qt6 QUIET COMPONENTS McpServer McpCommon)
+
+if(NOT Qt6McpServer_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(
+    qtmcp
+    GIT_REPOSITORY https://github.com/signal-slot/qtmcp.git
+    GIT_TAG 2706345c44e282aba15cf020608af2283e9fb5f9
+    GIT_SHALLOW TRUE
+    GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+  )
+  set(QT_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+  set(QT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(qtmcp)
+endif()
 
 # --- GammaRay (system package: gammaray-dev >= 3.4.0) ---
 find_package(GammaRay REQUIRED)

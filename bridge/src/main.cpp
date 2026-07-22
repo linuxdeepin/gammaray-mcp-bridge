@@ -25,6 +25,7 @@
 #include <QCommandLineParser>
 #include <QLoggingCategory>
 #include <QtMcpServer/QMcpServer>
+#include <QtMcpServer/QMcpServerBackendInterface>
 
 int main(int argc, char **argv)
 {
@@ -130,7 +131,13 @@ int main(int argc, char **argv)
     WidgetTools widgetTools(&session, &server);
     server.registerToolSet(&widgetTools, {});
 
-    QObject::connect(&server, &QMcpServer::finished, &app, &QCoreApplication::quit);
+    // QMcpServer::finished was introduced after v6.10.2. On v6.10.2 the
+    // signal lives on QMcpServerBackendInterface, so we connect through
+    // findChild. When the minimum qtmcp version is raised past v6.10.2,
+    // replace with: QObject::connect(&server, &QMcpServer::finished, ...);
+    auto *backend = server.findChild<QMcpServerBackendInterface *>();
+    Q_ASSERT(backend);
+    QObject::connect(backend, &QMcpServerBackendInterface::finished, &app, &QCoreApplication::quit);
 
     if (probeUrl.isValid()) {
         // Best-effort initial connection. If the probe isn't up yet, GammaRay's
