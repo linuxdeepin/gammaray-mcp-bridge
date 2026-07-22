@@ -60,6 +60,11 @@ GammaRaySession::GammaRaySession(QObject *parent)
         // re-entrancy: scheduleReconnect() sets m_reconnectScheduled so we only
         // arm one timer at a time. If the user calls disconnectFromHost()
         // (which clears m_serverUrl's intent) we won't reconnect.
+        // Clear lastError: GammaRay's TcpClientDevice treats RemoteHostClosedError
+        // as a persistentError (not transient), so persistentConnectionError may
+        // fire before disconnected. The error was already stale once we've
+        // disconnected; scheduleReconnect will attempt a fresh connection.
+        m_lastError.clear();
         setState(State::Disconnected);
         emit disconnected();
         scheduleReconnect();
