@@ -17,6 +17,7 @@
 #include "gammaray_session.h"
 #include "scenegraph_tools.h"
 #include "widget_tools.h"
+#include "qml_engine_tools.h"
 
 #include <common/endpoint.h>
 
@@ -130,6 +131,24 @@ int main(int argc, char **argv)
 
     WidgetTools widgetTools(&session, &server);
     server.registerToolSet(&widgetTools, {});
+
+    QmlEngineTools qmlEngineTools(&session, &server);
+    server.registerToolSet(&qmlEngineTools, {
+        { QStringLiteral("listQmlEngines"), QStringLiteral("List all QQmlEngine instances in the target app (engine properties, import paths, root context)") },
+        { QStringLiteral("selectQmlEngine"), QStringLiteral("Select a QQmlEngine by address (from listQmlEngines) so engine properties populate for it") },
+        { QStringLiteral("selectQmlEngine/address"), QStringLiteral("Engine address from listQmlEngines") },
+        { QStringLiteral("getEngineProperties"), QStringLiteral("Get all properties of a QQmlEngine (baseUrl, importPathList, pluginPathList, outputWarningsToStandardError, rootContext)") },
+        { QStringLiteral("getEngineProperties/address"), QStringLiteral("Engine address (from listQmlEngines)") },
+        { QStringLiteral("getWidgetQmlContexts"), QStringLiteral("Get the QML context chain for a selected widget (from root to leaf context, with addresses and locations)") },
+        { QStringLiteral("getWidgetQmlContexts/address"), QStringLiteral("Widget address (from listWidgets, must be selected first via selectWidget)") },
+        { QStringLiteral("getWidgetQmlContextProperties"), QStringLiteral("Get context properties (name/value pairs) for the selected context in a widget's context chain") },
+        { QStringLiteral("getWidgetQmlContextProperties/address"), QStringLiteral("Widget address (from listWidgets, must be selected first via selectWidget)") },
+        { QStringLiteral("getWidgetQmlTypeInfo"), QStringLiteral("Get QML type information (typeName, elementName, version, isSingleton, isComposite, sourceUrl, etc.) for a selected widget") },
+        { QStringLiteral("getWidgetQmlTypeInfo/address"), QStringLiteral("Widget address (from listWidgets, must be selected first via selectWidget)") },
+        { QStringLiteral("selectQmlContext"), QStringLiteral("Select a context in the context chain by index (from getWidgetQmlContexts). This populates the context property model, allowing getWidgetQmlContextProperties to return the selected context's properties.") },
+        { QStringLiteral("selectQmlContext/address"), QStringLiteral("Widget address (from listWidgets, must be selected first via selectWidget)") },
+        { QStringLiteral("selectQmlContext/contextIndex"), QStringLiteral("0-based index into the context chain from getWidgetQmlContexts (0 = root, 1 = leaf, etc.)") },
+    });
 
     // QMcpServer::finished was introduced after v6.10.2. On v6.10.2 the
     // signal lives on QMcpServerBackendInterface, so we connect through

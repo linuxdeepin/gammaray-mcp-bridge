@@ -59,6 +59,8 @@ add_executable(gammaray-mcp-bridge
     src/widget_tools.h
     src/widget_inspector_proxy.cpp
     src/widget_inspector_proxy.h
+    src/qml_engine_tools.cpp
+    src/qml_engine_tools.h
 )
 
 target_link_libraries(gammaray-mcp-bridge PRIVATE
