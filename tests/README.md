@@ -21,6 +21,7 @@ end-to-end against a real GammaRay probe.
 | `test_items.py` | `selectQuickItem`, `getItemProperties`, position, visual properties, groups | Yes |
 | `test_scenegraph.py` | `selectScenegraphNode`, `getNodeVertices`, `getNodeAdjacency`, `getMaterialShaders`, `getMaterialProperties`, `setRenderMode`, `setSlowMode` | Yes |
 | `test_widgets.py` | `listWidgets`, `selectWidget`, `getWidgetProperties`, `getWidgetAttributes` | Yes (--widget-app) |
+| `test_models.py` | `listQtModels`, `selectModel`, `getModelContent`, `getModelHeaders`, `getModelCell`, `listSelectionModels` | Yes (--widget-app) |
 
 ## Test applications
 
@@ -30,7 +31,10 @@ visibility/opacity controls.
 
 `testapp/widget_test_app.cpp` is a simple QWidget application (QLabel, QLineEdit,
 QCheckBox, QGroupBox, QPushButton) for testing widget inspection tools. Use
-`run_widget_tests.sh` to run tests against this app.
+`run_widget_tests.sh` to run tests against this app. It also carries a
+QStandardItemModel (3×2, headers `Name`/`Value`, data `Alpha`/`Beta`/`Gamma`)
+viewed by a QTableView and a QListWidget (`Red`/`Green`/`Blue`) for the model
+inspection tools.
 
 ## Configuration
 

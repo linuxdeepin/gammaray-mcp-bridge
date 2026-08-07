@@ -126,6 +126,16 @@ System dependencies (`gammaray >= 3.4.0`, Qt6 libs) are auto-detected.
 | `getWidgetProperties(address)` | Get all Q_PROPERTY values (geometry, font, palette, window flags, etc.) |
 | `getWidgetAttributes(address)` | Get Qt::WidgetAttribute flags (acceptDrops, enabled, etc.) |
 
+### Qt Model inspection
+| Tool | Description |
+|---|---|
+| `listQtModels()` | List all QAbstractItemModel instances (proxies nested), with row/column counts |
+| `selectModel(address)` | Select a model, populating its content/headers/selection-models sub-models |
+| `getModelContent(address, maxRows, maxColumns)` | Read the model's table data (bounded, defaults 50×20) |
+| `getModelHeaders(address, maxSections)` | Read horizontal and vertical header labels |
+| `getModelCell(address, row, column)` | Read every role name/type/value for one cell |
+| `listSelectionModels(address)` | List QItemSelectionModel instances attached to the selected model |
+
 ## Testing
 
 ```bash

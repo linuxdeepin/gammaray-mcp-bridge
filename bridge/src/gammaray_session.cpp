@@ -51,6 +51,7 @@ GammaRaySession::GammaRaySession(QObject *parent)
         // read rowCount()/data() directly on these cached instances.
         GammaRay::ObjectBroker::model(QStringLiteral("com.kdab.GammaRay.QuickWindowModel"));
         GammaRay::ObjectBroker::model(QStringLiteral("com.kdab.GammaRay.QuickSceneGraphModel"));
+        GammaRay::ObjectBroker::model(QStringLiteral("com.kdab.GammaRay.ModelModel"));
         emit ready();
     });
     QObject::connect(m_conMan, &GammaRay::ClientConnectionManager::disconnected, [this]() {

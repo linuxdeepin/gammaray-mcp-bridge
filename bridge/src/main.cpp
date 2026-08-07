@@ -18,6 +18,7 @@
 #include "scenegraph_tools.h"
 #include "widget_tools.h"
 #include "qml_engine_tools.h"
+#include "model_tools.h"
 
 #include <common/endpoint.h>
 
@@ -38,6 +39,7 @@ int main(int argc, char **argv)
     app.setApplicationName(QStringLiteral("gammaray-mcp-bridge"));
     app.setApplicationVersion(QStringLiteral("0.1.0"));
     app.setOrganizationName(QStringLiteral("KDAB"));
+    app.setQuitOnLastWindowClosed(false);
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QStringLiteral("GammaRay MCP Bridge"));
@@ -71,13 +73,17 @@ int main(int argc, char **argv)
 
     GammaRaySession session(&app);
 
+    SceneGraphTools tools(&session, &session);
+    WidgetTools widgetTools(&session, &session);
+    QmlEngineTools qmlEngineTools(&session, &session);
+    ModelTools modelTools(&session, &session);
+
     QMcpServer server(QStringLiteral("stdio"));
     server.setInstructions(QStringLiteral(
-        "QML SceneGraph & Qt Widget introspection via GammaRay. Connects to a "
+        "QML SceneGraph, Qt Widget and Qt Model introspection via GammaRay. Connects to a "
         "GammaRay probe injected into a Qt/QML application and exposes the scene "
-        "graph, QML items, widgets, geometry, materials and shaders as tools."));
+        "graph, QML items, widgets, Qt models, geometry, materials and shaders as tools."));
 
-    SceneGraphTools tools(&session, &server);
     server.registerToolSet(&tools, {
         // Connection management
         { QStringLiteral("connectProbe"), QStringLiteral("Connect to a GammaRay probe. host defaults to 127.0.0.1; pass port=0 to use the default 11732.") },
@@ -129,10 +135,8 @@ int main(int argc, char **argv)
         { QStringLiteral("getWidgetAttributes/address"), QStringLiteral("Widget address (from listWidgets)") },
     });
 
-    WidgetTools widgetTools(&session, &server);
     server.registerToolSet(&widgetTools, {});
 
-    QmlEngineTools qmlEngineTools(&session, &server);
     server.registerToolSet(&qmlEngineTools, {
         { QStringLiteral("listQmlEngines"), QStringLiteral("List all QQmlEngine instances in the target app (engine properties, import paths, root context)") },
         { QStringLiteral("selectQmlEngine"), QStringLiteral("Select a QQmlEngine by address (from listQmlEngines) so engine properties populate for it") },
@@ -150,21 +154,44 @@ int main(int argc, char **argv)
         { QStringLiteral("selectQmlContext/contextIndex"), QStringLiteral("0-based index into the context chain from getWidgetQmlContexts (0 = root, 1 = leaf, etc.)") },
     });
 
+    server.registerToolSet(&modelTools, {
+        // Model discovery
+        { QStringLiteral("listQtModels"), QStringLiteral("List every QAbstractItemModel in the target app (types, names, addresses; proxy models nested under their source model)") },
+        { QStringLiteral("selectModel"), QStringLiteral("Select a Qt model by address (from listQtModels) so its content and selection-model sub-models populate") },
+        { QStringLiteral("selectModel/address"), QStringLiteral("Model address from listQtModels") },
+        // Content inspection
+        { QStringLiteral("getModelContent"), QStringLiteral("Read the table content of the selected Qt model (bounded view; pass maxRows/maxColumns/fromRow/fromColumn to page through large models)") },
+        { QStringLiteral("getModelContent/address"), QStringLiteral("Model address (from listQtModels)") },
+        { QStringLiteral("getModelContent/maxRows"), QStringLiteral("Maximum rows to return (default 50)") },
+        { QStringLiteral("getModelContent/maxColumns"), QStringLiteral("Maximum columns to return (default 20)") },
+        { QStringLiteral("getModelContent/fromRow"), QStringLiteral("First row to return (default 0)") },
+        { QStringLiteral("getModelContent/fromColumn"), QStringLiteral("First column to return (default 0)") },
+        { QStringLiteral("getModelHeaders"), QStringLiteral("Get the horizontal and vertical headers of the selected Qt model") },
+        { QStringLiteral("getModelHeaders/address"), QStringLiteral("Model address (from listQtModels)") },
+        { QStringLiteral("getModelHeaders/maxSections"), QStringLiteral("Maximum header sections per orientation to return (default 50)") },
+        { QStringLiteral("getModelCell"), QStringLiteral("Get every role value (DisplayRole, EditRole, custom roles, etc.) for a single cell of the selected Qt model") },
+        { QStringLiteral("getModelCell/address"), QStringLiteral("Model address (from listQtModels)") },
+        { QStringLiteral("getModelCell/row"), QStringLiteral("Row index of the cell") },
+        { QStringLiteral("getModelCell/column"), QStringLiteral("Column index of the cell") },
+        // Selection models
+        { QStringLiteral("listSelectionModels"), QStringLiteral("List the QItemSelectionModel instances attached to the selected Qt model (selected items/rows/columns)") },
+        { QStringLiteral("listSelectionModels/address"), QStringLiteral("Model address (from listQtModels)") },
+    });
+
     // QMcpServer::finished was introduced after v6.10.2. On v6.10.2 the
     // signal lives on QMcpServerBackendInterface, so we connect through
     // findChild. When the minimum qtmcp version is raised past v6.10.2,
     // replace with: QObject::connect(&server, &QMcpServer::finished, ...);
     auto *backend = server.findChild<QMcpServerBackendInterface *>();
-    Q_ASSERT(backend);
-    QObject::connect(backend, &QMcpServerBackendInterface::finished, &app, &QCoreApplication::quit);
+    if (backend) {
+        QObject::connect(backend, &QMcpServerBackendInterface::finished, &app, &QCoreApplication::quit);
+    }
 
     if (probeUrl.isValid()) {
-        // Best-effort initial connection. If the probe isn't up yet, GammaRay's
-        // ClientConnectionManager retries every 1s for 60s; tools will also
-        // transparently retry via ensureConnected() once a URL is known.
         session.connectToHost(probeUrl);
     }
 
     server.start();
+
     return app.exec();
 }

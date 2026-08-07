@@ -12,6 +12,11 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QStandardItemModel>
+#include <QTableView>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QHBoxLayout>
 
 int main(int argc, char **argv)
 {
@@ -44,6 +49,29 @@ int main(int argc, char **argv)
 
     auto *button = new QPushButton(QStringLiteral("Click Me"));
     layout->addWidget(button);
+
+    // A table view backed by a QStandardItemModel, for the model inspection tools.
+    auto *tableModel = new QStandardItemModel(3, 2, mainWindow);
+    tableModel->setHorizontalHeaderLabels({ QStringLiteral("Name"), QStringLiteral("Value") });
+    tableModel->setItem(0, 0, new QStandardItem(QStringLiteral("Alpha")));
+    tableModel->setItem(0, 1, new QStandardItem(QStringLiteral("1")));
+    tableModel->setItem(1, 0, new QStandardItem(QStringLiteral("Beta")));
+    tableModel->setItem(1, 1, new QStandardItem(QStringLiteral("2")));
+    tableModel->setItem(2, 0, new QStandardItem(QStringLiteral("Gamma")));
+    tableModel->setItem(2, 1, new QStandardItem(QStringLiteral("3")));
+
+    auto *table = new QTableView();
+    table->setModel(tableModel);
+    table->setFixedHeight(120);
+    layout->addWidget(table);
+
+    // A list widget (backed by QListWidgetModel, another QAbstractItemModel).
+    auto *listWidget = new QListWidget();
+    listWidget->addItem(new QListWidgetItem(QStringLiteral("Red")));
+    listWidget->addItem(new QListWidgetItem(QStringLiteral("Green")));
+    listWidget->addItem(new QListWidgetItem(QStringLiteral("Blue")));
+    listWidget->setFixedHeight(80);
+    layout->addWidget(listWidget);
 
     mainWindow->show();
     return app.exec();
