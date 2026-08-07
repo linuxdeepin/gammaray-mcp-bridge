@@ -1,7 +1,7 @@
 /*
   scenegraph_tools.h — Q_INVOKABLE methods exposed as MCP tools via qtmcp.
 
-  SPDX-FileCopyrightText: 2026 The GammaRay MCP Bridge Authors
+  SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
   SPDX-License-Identifier: GPL-2.0-or-later
 
   Return types are constrained by qtmcp's callTool(): void/bool/QString/QStringList/

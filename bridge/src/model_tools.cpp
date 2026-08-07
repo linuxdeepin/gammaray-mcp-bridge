@@ -1,7 +1,7 @@
 /*
   model_tools.cpp — Qt model (QAbstractItemModel) introspection tools via GammaRay.
 
-  SPDX-FileCopyrightText: 2026 The GammaRay MCP Bridge Authors
+  SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
   SPDX-License-Identifier: GPL-2.0-or-later
 
   These tools drive the probe-side ModelInspector plugin:

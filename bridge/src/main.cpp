@@ -1,7 +1,7 @@
 /*
   gammaray-mcp-bridge — MCP server bridging GammaRay introspection.
 
-  SPDX-FileCopyrightText: 2026 The GammaRay MCP Bridge Authors
+  SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
   SPDX-License-Identifier: GPL-2.0-or-later
 
   The bridge is a GammaRay CLIENT peer: it connects to a probe injected into a
