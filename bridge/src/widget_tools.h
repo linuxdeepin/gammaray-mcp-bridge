@@ -8,11 +8,13 @@
 #ifndef WIDGET_TOOLS_H
 #define WIDGET_TOOLS_H
 
+#include <QImage>
 #include <QObject>
 #include <QString>
 #include <QModelIndex>
 
 class GammaRaySession;
+class ScreenshotProxy;
 
 class WidgetTools : public QObject
 {
@@ -29,9 +31,16 @@ public:
     // Get Qt::WidgetAttribute flags for a selected widget.
     Q_INVOKABLE QString getWidgetAttributes(const QString &address) const;
 
+    // --- Screenshot ---
+    // Capture a screenshot of the window containing the given widget.
+    // The widget address must be from listWidgets. Returns a QImage that
+    // qtmcp converts to an MCP image content for vision-capable models.
+    Q_INVOKABLE QImage screenshotWidget(const QString &address) const;
+
 private:
     GammaRaySession *m_session;
     mutable QString m_selectedWidgetAddress;
+    mutable ScreenshotProxy *m_widgetScreenshotProxy = nullptr;
 
     QString ensureSession() const;
     QString ensureWidgetSelected(const QString &address) const;

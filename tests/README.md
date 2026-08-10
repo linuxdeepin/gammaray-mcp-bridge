@@ -15,11 +15,12 @@ end-to-end against a real GammaRay probe.
 ## Test files
 
 | File | Tests | Probe required |
-|---|---|---|
+|---|---|---|---|
 | `test_connection.py` | `connectProbe`, `probeStatus`, `disconnectProbe`, reconnect | Yes (except `test_tools_listed`, `test_probe_status_disconnected`) |
 | `test_navigation.py` | `listQuickWindows`, `selectQuickWindow`, `listQuickItems`, `listScenegraphNodes` | Yes |
 | `test_items.py` | `selectQuickItem`, `getItemProperties`, position, visual properties, groups | Yes |
 | `test_scenegraph.py` | `selectScenegraphNode`, `getNodeVertices`, `getNodeAdjacency`, `getMaterialShaders`, `getMaterialProperties`, `setRenderMode`, `setSlowMode` | Yes |
+| `test_screenshot.py` | `screenshotQuickItem`, `screenshotWidget` | Yes |
 | `test_widgets.py` | `listWidgets`, `selectWidget`, `getWidgetProperties`, `getWidgetAttributes` | Yes (--widget-app) |
 | `test_models.py` | `listQtModels`, `selectModel`, `getModelContent`, `getModelHeaders`, `getModelCell`, `listSelectionModels` | Yes (--widget-app) |
 

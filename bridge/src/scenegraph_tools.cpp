@@ -10,6 +10,7 @@
 #include "material_interface.h"
 #include "property_reader.h"
 #include "quickinspector_types.h"
+#include "screenshot_proxy.h"
 
 #include <endpoint.h>
 #include <protocol.h>
@@ -934,4 +935,30 @@ QString SceneGraphTools::setSlowMode(bool enabled) const
     return QString::fromUtf8(QJsonDocument(QJsonObject{
         { QStringLiteral("slowMode"), enabled },
     }).toJson(QJsonDocument::Compact));
+}
+
+QImage SceneGraphTools::screenshotQuickItem(const QString &address) const
+{
+    if (const QString e = ensureSession(); !e.isEmpty())
+        return {};
+    if (const QString e = ensureQuickInspector(); !e.isEmpty())
+        return {};
+
+    if (address.isEmpty())
+        return {};
+
+    const QString selErr = ensureItemSelected(address);
+    if (!selErr.isEmpty())
+        return {};
+
+    if (!m_quickScreenshotProxy) {
+        m_quickScreenshotProxy = new ScreenshotProxy(
+            QStringLiteral("com.kdab.GammaRay.QuickRemoteView"));
+        m_quickScreenshotProxy->registerWithEndpoint();
+    }
+
+    if (!m_quickScreenshotProxy->requestFrame(10000))
+        return {};
+
+    return m_quickScreenshotProxy->lastImage();
 }

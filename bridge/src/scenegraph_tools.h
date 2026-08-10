@@ -31,11 +31,13 @@
 #ifndef SCENEGRAPH_TOOLS_H
 #define SCENEGRAPH_TOOLS_H
 
+#include <QImage>
 #include <QObject>
 #include <QString>
 #include <QModelIndex>
 
 class GammaRaySession;
+class ScreenshotProxy;
 
 class SceneGraphTools : public QObject
 {
@@ -95,10 +97,17 @@ public:
     // Toggle slow animations mode (renders continuously instead of on-demand).
     Q_INVOKABLE QString setSlowMode(bool enabled) const;
 
+    // --- Screenshot ---
+    // Capture a screenshot of the window containing the given QML item.
+    // The item address must be from listQuickItems. Returns a QImage that
+    // qtmcp converts to an MCP image content for vision-capable models.
+    Q_INVOKABLE QImage screenshotQuickItem(const QString &address) const;
+
 private:
     GammaRaySession *m_session;
     mutable QString m_selectedAddress; // last selected SG node address (for sub-model tools)
     mutable QString m_selectedItemAddress; // last selected QuickItem address (for property tools)
+    mutable ScreenshotProxy *m_quickScreenshotProxy = nullptr;
 
 
     QString ensureSession() const;

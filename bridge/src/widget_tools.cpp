@@ -8,6 +8,7 @@
 #include "widget_tools.h"
 #include "gammaray_session.h"
 #include "property_reader.h"
+#include "screenshot_proxy.h"
 
 #include <endpoint.h>
 #include <objectbroker.h>
@@ -361,4 +362,28 @@ QString WidgetTools::getWidgetAttributes(const QString &address) const
     out.insert(QStringLiteral("attributes"), attrs);
     out.insert(QStringLiteral("count"), rows);
     return QString::fromUtf8(QJsonDocument(out).toJson(QJsonDocument::Compact));
+}
+
+QImage WidgetTools::screenshotWidget(const QString &address) const
+{
+    if (const QString e = ensureSession(); !e.isEmpty())
+        return {};
+
+    if (address.isEmpty())
+        return {};
+
+    const QString selErr = ensureWidgetSelected(address);
+    if (!selErr.isEmpty())
+        return {};
+
+    if (!m_widgetScreenshotProxy) {
+        m_widgetScreenshotProxy = new ScreenshotProxy(
+            QStringLiteral("com.kdab.GammaRay.WidgetRemoteView"));
+        m_widgetScreenshotProxy->registerWithEndpoint();
+    }
+
+    if (!m_widgetScreenshotProxy->requestFrame(10000))
+        return {};
+
+    return m_widgetScreenshotProxy->lastImage();
 }

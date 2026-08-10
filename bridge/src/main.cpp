@@ -124,6 +124,9 @@ int main(int argc, char **argv)
         { QStringLiteral("setRenderMode/mode"), QStringLiteral("Render mode: NormalRendering, VisualizeClipping, VisualizeOverdraw, VisualizeBatches, VisualizeChanges, or VisualizeTraces") },
         { QStringLiteral("setSlowMode"), QStringLiteral("Toggle slow animations mode (renders continuously instead of on-demand)") },
         { QStringLiteral("setSlowMode/enabled"), QStringLiteral("true to enable slow mode, false to disable") },
+        // Screenshot
+        { QStringLiteral("screenshotQuickItem"), QStringLiteral("Capture a screenshot of the window containing the specified QML item. The item address must be from listQuickItems.") },
+        { QStringLiteral("screenshotQuickItem/address"), QStringLiteral("Item address (from listQuickItems)") },
         // Widget tree navigation
         { QStringLiteral("listWidgets"), QStringLiteral("List the QWidget hierarchy (widget types, names, visibility)") },
         // Widget selection + properties
@@ -135,7 +138,10 @@ int main(int argc, char **argv)
         { QStringLiteral("getWidgetAttributes/address"), QStringLiteral("Widget address (from listWidgets)") },
     });
 
-    server.registerToolSet(&widgetTools, {});
+    server.registerToolSet(&widgetTools, {
+        { QStringLiteral("screenshotWidget"), QStringLiteral("Capture a screenshot of the window containing the specified widget. The widget address must be from listWidgets.") },
+        { QStringLiteral("screenshotWidget/address"), QStringLiteral("Widget address from listWidgets") },
+    });
 
     server.registerToolSet(&qmlEngineTools, {
         { QStringLiteral("listQmlEngines"), QStringLiteral("List all QQmlEngine instances in the target app (engine properties, import paths, root context)") },

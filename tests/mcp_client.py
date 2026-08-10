@@ -1,5 +1,6 @@
 """MCP client helper for testing the gammaray-mcp bridge."""
 
+import base64
 import json
 import subprocess
 import sys
@@ -84,13 +85,21 @@ class McpClient:
     def call_tool(self, name: str, arguments: dict | None = None, timeout: float = 60.0) -> dict:
         resp = self.send_request("tools/call", {"name": name, "arguments": arguments or {}}, timeout=timeout)
         content = resp.get("result", {}).get("content", [])
-        if content and content[0].get("type") == "text":
+        if not content:
+            return resp.get("result", {})
+        ctype = content[0].get("type", "")
+        if ctype == "text":
             text = content[0]["text"]
             try:
                 return json.loads(text)
             except (json.JSONDecodeError, TypeError):
                 return {"_raw": text}
-        return resp.get("result", {})
+        if ctype == "image":
+            return {
+                "_image_data": content[0].get("data", ""),
+                "_mime_type": content[0].get("mimeType", "image/png"),
+            }
+        return {"_raw_content": content}
 
     def list_tools(self) -> list[dict]:
         resp = self.send_request("tools/list")

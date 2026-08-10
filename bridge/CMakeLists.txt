@@ -48,6 +48,9 @@ add_executable(gammaray-mcp-bridge
     src/gammaray_session.h
     src/scenegraph_tools.cpp
     src/scenegraph_tools.h
+    src/screenshot_proxy.cpp
+    src/screenshot_proxy.h
+    src/remoteviewframe.h
     src/material_interface.cpp
     src/material_interface.h
     src/quickinspector_proxy.cpp
