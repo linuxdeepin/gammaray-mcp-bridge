@@ -27,7 +27,7 @@ if(NOT Qt6McpServer_FOUND)
   FetchContent_Declare(
     qtmcp
     GIT_REPOSITORY https://github.com/signal-slot/qtmcp.git
-    GIT_TAG 2706345c44e282aba15cf020608af2283e9fb5f9
+    GIT_TAG cd46c622e4881bed2ae786285fab0b14a7271f13
     GIT_SHALLOW TRUE
     GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
   )
